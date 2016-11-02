@@ -41,6 +41,14 @@ End-ds;
 
 Dcl-Ds gGitLog LikeDS(File_Temp);
 
+Dcl-S gisText Ind;
+Dcl-Ds gLogEntry Qualified;
+  Hash   Char(7);
+  Author Char(64);
+  Date   Char(64);
+  Text   Char(128);
+End-Ds;
+
 //************************
 
 Dcl-S gUser  Char(10) Inz(*User);
@@ -73,7 +81,17 @@ If (gGitLog.FilePtr = *Null);
   Return;
 ENDIF;
 
+//Loop through file and parse it and fille gLogEntry
 
+EXEC SQL
+  INSERT INTO QTEMP/GITLOG (
+    commit_hash, commit_auth, commit_date, commit_text
+  ) values (
+    :gGitLog.Hash,
+    :gGitLog.Author,
+    :gGitLog.Date,
+    :gGitLog.Text
+  );
 
 *InLR = *On;
 Return;
