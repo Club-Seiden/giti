@@ -40,8 +40,11 @@ Dcl-Ds File_Temp Qualified Template;
 End-ds;
 
 Dcl-Ds gGitLog LikeDS(File_Temp);
+Dcl-S  gKey Char(6);
 
-Dcl-S gisText Ind;
+Dcl-S gIsText Ind;
+Dcl-S gText   Varchar(128);
+
 Dcl-Ds gLogEntry Qualified;
   Hash   Char(7);
   Author Char(64);
@@ -81,17 +84,66 @@ If (gGitLog.FilePtr = *Null);
   Return;
 ENDIF;
 
-//Loop through file and parse it and fille gLogEntry
+gIsText = *Off;
 
-EXEC SQL
-  INSERT INTO QTEMP/GITLOG (
-    commit_hash, commit_auth, commit_date, commit_text
-  ) values (
-    :gGitLog.Hash,
-    :gGitLog.Author,
-    :gGitLog.Date,
-    :gGitLog.Text
-  );
+Dow (ReadFile(%addr(gGitLog.RtvData)
+             :%Len(gGitLog.RtvData)
+             :gGitLog.FilePtr) <> *null);
+
+  If (%Subst(gGitLog.RtvData:1:1) = x'25');
+    gIsText = *On;
+    Iter;
+  ENDIF;
+
+  gGitLog.RtvData = %xlate(x'00':' ':gGitLog.RtvData);//End of record null
+  gGitLog.RtvData = %xlate(x'25':' ':gGitLog.RtvData);//Line feed (LF)
+  gGitLog.RtvData = %xlate(x'0D':' ':gGitLog.RtvData);//Carriage return (CR)
+  gGitLog.RtvData = %xlate(x'05':' ':gGitLog.RtvData);//Tab
+
+  gKey = %Subst(gGitLog.RtvData:1:6);
+
+  Select;
+    When (gKey = 'commit');
+      if (gIsText = *On);
+        //Last commit finished, write to file?
+        gLogEntry.Text = gText;
+        Log_Commit();
+        Clear gText;
+        Clear gLogEntry;
+        gIsText = *Off;
+      ENDIF;
+      gLogEntry.Hash = %Subst(gGitLog.RtvData:8:7);
+
+    When (gKey = 'Author');
+      gLogEntry.Author = %Subst(gGitLog.RtvData:9);
+
+    When (gKey = 'Date:');
+      gLogEntry.Date = %Subst(gGitLog.RtvData:9);
+
+    When (gGitLog.RtvData = *Blank);
+      gIsText = *On;
+
+    Other;
+      If (gIsText);
+        gText += %Trim(gGitLog.RtvData) + ' ';
+      ENDIF;
+
+  ENDSL;
+
+  gGitLog.RtvData = '';
+Enddo;
 
 *InLR = *On;
 Return;
+
+Dcl-Proc Log_Commit;
+  EXEC SQL
+  INSERT INTO QTEMP/GITLOG (
+    commit_hash, commit_auth, commit_date, commit_text
+  ) values (
+    :gLogEntry.Hash,
+    :gLogEntry.Author,
+    :gLogEntry.Date,
+    :gLogEntry.Text
+  );
+END-PROC;
