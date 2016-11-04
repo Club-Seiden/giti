@@ -2,7 +2,8 @@
 Ctl-Opt DftActGrp(*No) ActGrp(*NEW);
 
 Dcl-Pi GITLOGPRSE;
-  pFile Char(128);
+  pFile  Char(128);
+  pValid Ind;
 End-Pi;
 
 //************************
@@ -39,8 +40,9 @@ Dcl-Ds File_Temp Qualified Template;
  FilePtr  pointer inz;
 End-ds;
 
-Dcl-Ds gGitLog LikeDS(File_Temp);
-Dcl-S  gKey Char(6);
+Dcl-S  gRecords Int(5) Inz(0);
+Dcl-Ds gGitLog  LikeDS(File_Temp);
+Dcl-S  gKey     Char(6);
 
 Dcl-S gIsText Ind;
 Dcl-S gText   Varchar(128);
@@ -134,6 +136,13 @@ Dow (ReadFile(%addr(gGitLog.RtvData)
   gGitLog.RtvData = '';
 Enddo;
 
+If (gRecords = 0);
+  pValid = *Off;
+  showMessage('The file you provided may be invalid.');
+Else;
+  pValid = *On;
+ENDIF;
+
 *InLR = *On;
 Return;
 
@@ -152,4 +161,33 @@ Dcl-Proc Log_Commit;
       :gLogEntry.Date,
       :gLogEntry.Text
     );
+
+  gRecords += 1;
+END-PROC;
+
+//**************
+
+Dcl-Proc showMessage;
+  Dcl-Pi showMessage;
+    Text Varchar(8192) Const;
+  END-PI;
+
+  Dcl-DS ErrCode;
+    BytesIn  Int(10) Inz(0);
+    BytesOut Int(10) Inz(0);
+  END-DS;
+
+  Dcl-PR QUILNGTX ExtPgm('QUILNGTX');
+    MsgText     Char(8192)    Const;
+    MsgLength   Int(10)       Const;
+    MessageId   Char(7)       Const;
+    MessageFile Char(21)      Const;
+    dsErrCode   Like(ErrCode);
+  END-PR;
+
+  QUILNGTX(Text:%Len(Text):
+     '':'':
+     ErrCode);
+
+  Return;
 END-PROC;

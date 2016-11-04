@@ -7,6 +7,7 @@ Dcl-F SCREEN Workstn;
 //or for a specific file in the repo.
 Dcl-Pr GitLogParse ExtPgm('GITLOGPRSE');
   *N Char(128); //Pass in gFile
+  *N Ind;       //Pass in gValid
 End-Pr;
 
 Dcl-S  gCmtCnt  Int(5);
@@ -17,8 +18,9 @@ Dcl-Ds gCommits Qualified Dim(50);
   Text   Char(128);
 End-Ds;
 
-Dcl-S gFile Char(128) Inz('*ALL');
-Dcl-S gSQL  Varchar(150);
+Dcl-S gValid Ind       Inz(*On);
+Dcl-S gFile  Char(128) Inz('*ALL');
+Dcl-S gSQL   Varchar(150);
 
 //Program will assume CURDIR is repository
 FILE = gFile;
@@ -34,7 +36,7 @@ EXEC SQL
   );
 
 If (SQLSTATE = '00000');
-  GitLogParse(gFile);
+  GitLogParse(gFile:gValid);
 ENDIF;
 
 giti_LoadCommits();
@@ -47,6 +49,7 @@ Return;
 
 Dcl-Proc giti_LoadCommits;
   Dcl-S lIndex Int(3);
+  Dcl-S lScan  Int(3);
 
   Clear gCommits;
 
@@ -68,12 +71,17 @@ Dcl-Proc giti_LoadCommits;
     gCmtCnt = %Elem(gCommits);
   ENDIF;
 
+  MSG = 'Showing ' + %Char(gCmtCnt) + ' commits.';
+
   EXEC SQL
     CLOSE Commits;
 
   For lIndex = 1 to %Elem(gCommits);
     gCommits(lIndex).Date = %Subst(gCommits(lIndex).Date:5:15);
-    gCommits(lIndex).Author = %Subst(gCommits(lIndex).Author:1:%Scan('<':gCommits(lIndex).Author)-1);
+    lScan = %Scan('<':gCommits(lIndex).Author);
+    If (lScan > 0);
+      gCommits(lIndex).Author = %Subst(gCommits(lIndex).Author:1:lScan-1);
+    Endif;
   ENDFOR;
 
 END-PROC;
@@ -113,9 +121,11 @@ Dcl-Proc giti_LoadScreen;
       Other;
         If (FILE <> gFile);
           gFile = FILE;
-          GitLogParse(gFile);
-          lIndex = 1;
-          giti_LoadCommits();
+          GitLogParse(gFile:gValid);
+          If (gValid = *On);
+            lIndex = 1;
+            giti_LoadCommits();
+          Endif;
         ENDIF;
 
 
