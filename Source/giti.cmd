@@ -1,0 +1,1 @@
+             CMD        Prompt('giti client')

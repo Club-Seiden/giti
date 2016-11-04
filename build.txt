@@ -1,0 +1,24 @@
+name:
+	giti
+build:
+  &dev:WorksOfBarry
+  
+  //Requied table for CRTSQLRPGI.. :(
+  runsql sql('CREATE TABLE QTEMP/GITLOG ( commit_id int generated always as identity not null, commit_hash char(7) not null, commit_auth char(64) not null, commit_date char(64) not null, commit_text char(128) not null )') COMMIT(*NONE)
+  
+  CRTSRCPF FILE(&INTOLIB/Source) RCDLEN(112)
+  CPYFRMSTMF FROMSTMF('&DIR/Source/giti.cmd') TOMBR('/QSYS.lib/&INTOLIB.lib/Source.file/GITI.mbr') MBROPT(*ADD)
+  CPYFRMSTMF FROMSTMF('&DIR/Source/screen.dspf') TOMBR('/QSYS.lib/&INTOLIB.lib/Source.file/SCREEN.mbr') MBROPT(*ADD)
+  
+  //Create display file
+  CRTDSPF FILE(&INTOLIB/SCREEN) SRCFILE(&INTOLIB/Source) SRCMBR(SCREEN) REPLACE(*YES)
+  
+  //Create programs
+  CRTSQLRPGI OBJ(&INTOLIB/GITLOGPRSE) SRCSTMF('&DIR/Source/gitlogprse.sqlrpgle') COMMIT(*NONE) REPLACE(*YES) DBGVIEW(*SOURCE)
+  CRTSQLRPGI OBJ(&INTOLIB/GITLOGPRSE) SRCSTMF('&DIR/Source/main.sqlrpgle') COMMIT(*NONE) REPLACE(*YES) DBGVIEW(*SOURCE)
+  
+  //Create command
+  CRTCMD CMD(&INTOLIB/GITI) PGM(&INTOLIB/MAIN) SRCFILE(&INTOLIB/Source) SRCMBR(GITI) REPLACE(*YES) TEXT('Launch giti application')
+  
+  //Now we have to delete this so the giti runs correctly on first run
+  DLTOBJ OBJ(QTEMP/GITLOG) OBJTYPE(*FILE)
