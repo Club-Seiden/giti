@@ -18,8 +18,10 @@ Dcl-Ds gCommits Qualified Dim(50);
 End-Ds;
 
 Dcl-S gFile Char(128) Inz('*ALL');
+Dcl-S gSQL  Varchar(150);
 
 //Program will assume CURDIR is repository
+FILE = gFile;
 
 //When the program loads we need to make a place to store the git log
 EXEC SQL
@@ -31,12 +33,12 @@ EXEC SQL
     commit_text char(128) not null
   );
 
-GitLogParse(gFile);
+If (SQLSTATE = '00000');
+  GitLogParse(gFile);
+ENDIF;
+
 giti_LoadCommits();
 giti_LoadScreen();
-
-EXEC SQL
-  DROP TABLE QTEMP/GITLOG;
 
 *InLR = *On;
 Return;
@@ -45,6 +47,8 @@ Return;
 
 Dcl-Proc giti_LoadCommits;
   Dcl-S lIndex Int(3);
+
+  Clear gCommits;
 
   EXEC SQL
     DECLARE Commits CURSOR FOR
@@ -63,7 +67,7 @@ Dcl-Proc giti_LoadCommits;
     CLOSE Commits;
 
   For lIndex = 1 to %Elem(gCommits);
-    gCommits(lIndex).Date = %Subst(gCommits(lIndex).Date:5:14);
+    gCommits(lIndex).Date = %Subst(gCommits(lIndex).Date:5:15);
     gCommits(lIndex).Author = %Subst(gCommits(lIndex).Author:1:%Scan('<':gCommits(lIndex).Author)-1);
   ENDFOR;
 
@@ -84,6 +88,11 @@ Dcl-Proc giti_LoadScreen;
         lExit = *On;
 
       Other;
+        If (FILE <> gFile);
+          gFile = FILE;
+          GitLogParse(gFile);
+          giti_LoadCommits();
+        ENDIF;
 
     ENDSL;
 

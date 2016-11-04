@@ -85,6 +85,7 @@ If (gGitLog.FilePtr = *Null);
 ENDIF;
 
 gIsText = *Off;
+Log_Clear();
 
 Dow (ReadFile(%addr(gGitLog.RtvData)
              :%Len(gGitLog.RtvData)
@@ -136,14 +137,19 @@ Enddo;
 *InLR = *On;
 Return;
 
+Dcl-Proc Log_Clear;
+  EXEC SQL
+    DELETE FROM QTEMP/GITLOG;
+END-PROC;
+
 Dcl-Proc Log_Commit;
   EXEC SQL
-  INSERT INTO QTEMP/GITLOG (
-    commit_hash, commit_auth, commit_date, commit_text
-  ) values (
-    :gLogEntry.Hash,
-    :gLogEntry.Author,
-    :gLogEntry.Date,
-    :gLogEntry.Text
-  );
+    INSERT INTO QTEMP/GITLOG (
+      commit_hash, commit_auth, commit_date, commit_text
+    ) values (
+      :gLogEntry.Hash,
+      :gLogEntry.Author,
+      :gLogEntry.Date,
+      :gLogEntry.Text
+    );
 END-PROC;
