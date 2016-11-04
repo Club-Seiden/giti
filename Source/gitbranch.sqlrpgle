@@ -71,13 +71,18 @@ Dow (ReadFile(%addr(gBrnchFile.RtvData)
              :%Len(gBrnchFile.RtvData)
              :gBrnchFile.FilePtr) <> *null);
 
+  gBrnchFile.RtvData = %xlate(x'00':' ':gBrnchFile.RtvData);//End of record null
+  gBrnchFile.RtvData = %xlate(x'25':' ':gBrnchFile.RtvData);//Line feed (LF)
+  gBrnchFile.RtvData = %xlate(x'0D':' ':gBrnchFile.RtvData);//Carriage return (CR)
+  gBrnchFile.RtvData = %xlate(x'05':' ':gBrnchFile.RtvData);//Tab
+
   If (%Subst(gBrnchFile.RtvData:1:1) = '*');
     pBranches(gIndex).Active = *On;
   Else;
     pBranches(gIndex).Active = *Off;
   ENDIF;
 
-  pBranches(gIndex).Name = %Subst(pBranches(gIndex).Name:3);
+  pBranches(gIndex).Name = %Subst(gBrnchFile.RtvData:3);
   gIndex += 1;
 
   gBrnchFile.RtvData = '';
