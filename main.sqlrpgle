@@ -9,7 +9,7 @@ Dcl-Pr GitLogParse ExtPgm('GITLOGPRSE');
   *N Char(128); //Pass in gFile
 End-Pr;
 
-Dcl-S  gCmtCnt  Int(3);
+Dcl-S  gCmtCnt  Int(5);
 Dcl-Ds gCommits Qualified Dim(50);
   Hash   Char(7);
   Author Char(64);
@@ -63,6 +63,11 @@ Dcl-Proc giti_LoadCommits;
     FOR 50 ROWS
     INTO :gCommits;
 
+  gCmtCnt = SQLER3;
+  If (gCmtCnt > %Elem(gCommits));
+    gCmtCnt = %Elem(gCommits);
+  ENDIF;
+
   EXEC SQL
     CLOSE Commits;
 
@@ -87,12 +92,32 @@ Dcl-Proc giti_LoadScreen;
       When (*In12);
         lExit = *On;
 
+      When (*In44); //Page up
+        If (lIndex - 15 < 1);
+          MSG = 'Start of data';
+          lIndex = 1;
+        Else;
+          MSG = *Blank;
+          lIndex -= 15;
+        ENDIF;
+
+      When (*In66); //Page down
+        If ((lIndex + 15) + 15 > gCmtCnt);
+          lIndex = gCmtCnt - 15;
+          MSG = 'End of data';
+        Else;
+          MSG = *Blank;
+          lIndex += 15;
+        ENDIF;
+
       Other;
         If (FILE <> gFile);
           gFile = FILE;
           GitLogParse(gFile);
+          lIndex = 1;
           giti_LoadCommits();
         ENDIF;
+
 
     ENDSL;
 

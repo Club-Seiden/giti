@@ -1,4 +1,6 @@
      A          R MAIN                      CA12(12)
+     A                                      ROLLUP(66)
+     A                                      ROLLDOWN(44)
      A                                  2 31'File:'
      A            FILE          34   B  2 37COLOR(WHT)
      A                                      CHECK(LC)
@@ -63,4 +65,5 @@
      A            IN13           2   B 18  3COLOR(WHT)
      A            IN14           2   B 19  3COLOR(WHT)
      A            IN15           2   B 20  3COLOR(WHT)
+     A            MSG           26   O 24  2COLOR(WHT)
  
