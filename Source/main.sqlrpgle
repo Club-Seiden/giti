@@ -89,8 +89,10 @@ END-PROC;
 //****************************
 
 Dcl-Proc giti_LoadScreen;
-  Dcl-S lIndex Int(3) Inz(1);
-  Dcl-S lExit  Ind    Inz(*Off);
+  Dcl-S lIndex  Int(3)  Inz(1);
+  Dcl-S lOptInd Int(3);
+  Dcl-S lOpt    Char(2) Dim(15);
+  Dcl-S lExit   Ind    Inz(*Off);
 
   Dow (lExit = *Off);
     ExSR  LoadData;
@@ -126,12 +128,38 @@ Dcl-Proc giti_LoadScreen;
             lIndex = 1;
             giti_LoadCommits();
           Endif;
+        Else;
+          Exsr ProcessOpt;
         ENDIF;
-
 
     ENDSL;
 
   ENDDO;
+
+  Begsr ProcessOpt;
+    lOpt(1)  = IN1;
+    lOpt(2)  = IN2;
+    lOpt(3)  = IN3;
+    lOpt(4)  = IN4;
+    lOpt(5)  = IN5;
+    lOpt(6)  = IN6;
+    lOpt(7)  = IN7;
+    lOpt(8)  = IN8;
+    lOpt(9)  = IN9;
+    lOpt(10) = IN10;
+    lOpt(11) = IN11;
+    lOpt(12) = IN12;
+    lOpt(13) = IN13;
+    lOpt(14) = IN14;
+    lOpt(15) = IN15;
+
+    For lOptInd = 1 to 15;
+      Select;
+        When (lOpt(lOptInd) = '5');
+          giti_DisplayCommit(gCommits(lIndex + (lOptInd-1)).Hash);
+      ENDSL;
+    ENDFOR;
+  ENDSR;
 
   Begsr LoadData;
     USER1  = gCommits(lIndex).Author;
@@ -182,6 +210,22 @@ Dcl-Proc giti_LoadScreen;
     MSG14 = gCommits(lIndex+13).Text;
     MSG15 = gCommits(lIndex+14).Text;
 
+    IN1  = *Blank;
+    IN2  = *Blank;
+    IN3  = *Blank;
+    IN4  = *Blank;
+    IN5  = *Blank;
+    IN6  = *Blank;
+    IN7  = *Blank;
+    IN8  = *Blank;
+    IN9  = *Blank;
+    IN10 = *Blank;
+    IN11 = *Blank;
+    IN12 = *Blank;
+    IN13 = *Blank;
+    IN14 = *Blank;
+    IN15 = *Blank;
+
     If (USER1 = *Blank);
       IN1 = x'2F';
     ENDIF;
@@ -228,4 +272,43 @@ Dcl-Proc giti_LoadScreen;
       IN15 = x'2F';
     ENDIF;
   ENDSR;
+END-PROC;
+
+//*********************
+
+Dcl-Proc giti_DisplayCommit;
+  Dcl-Pi *N;
+    pHash Char(7) Const;
+  END-PI;
+
+  Dcl-S  lExit   Ind Inz(*Off);
+  Dcl-Ds lCommit LikeDS(gCommits);
+
+  EXEC SQL
+    SELECT commit_hash, commit_auth, commit_date, commit_text
+    INTO :lCommit
+    FROM QTEMP/GITLOG
+    WHERE commit_hash = :pHash;
+
+  If (SQLSTATE <> '00000');
+    MSG = 'Unable to find commit.';
+    Return;
+  ENDIF;
+
+  CMTHSH  = pHash;
+  CMTAUT  = lCommit.Author;
+  CMTDTE  = lCommit.Date;
+  CMTMSG1 = %Subst(lCommit.Text:1:64);
+  CMTMSG2 = %Subst(lCommit.Text:65);
+
+  Dow (lExit = *Off);
+    Exfmt CMTDSP;
+
+    Select;
+      When (*In12);
+        lExit = *On;
+      Other;
+        //Nothing
+    ENDSL;
+  ENDDO;
 END-PROC;

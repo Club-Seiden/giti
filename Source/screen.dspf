@@ -1,6 +1,7 @@
      A          R MAIN                      CA12(12)
      A                                      ROLLUP(66)
      A                                      ROLLDOWN(44)
+     A                                      CA03(12)
      A                                  2 31'File:'
      A            FILE          34   B  2 37COLOR(WHT)
      A                                      CHECK(LC)
@@ -66,4 +67,18 @@
      A            IN14           2   B 19  3COLOR(WHT)
      A            IN15           2   B 20  3COLOR(WHT)
      A            MSG           26   O 24  2COLOR(WHT)
+     A                                  2  3'giti'
+     A                                      COLOR(RED)
+     A          R CMTDSP                    CA12(12)
+     A                                  2  3'giti'
+     A                                      COLOR(RED)
+     A            CMTHSH         7   O  6 21
+     A                                  6 12'Hash:'
+     A            CMTAUT        64   O 10  9
+     A                                  9 10'Author:'
+     A                                  7 12'Date:'
+     A            CMTDTE        30   O  7 21
+     A            CMTMSG1       64   O 13  9
+     A                                 12  9'Message:'
+     A            CMTMSG2       64     14  9
  

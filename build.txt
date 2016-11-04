@@ -21,4 +21,5 @@ build:
   CRTCMD CMD(&INTOLIB/GITI) PGM(&INTOLIB/MAIN) SRCFILE(&INTOLIB/Source) SRCMBR(GITI) REPLACE(*YES) TEXT('Launch giti application')
   
   //Now we have to delete this so the giti runs correctly on first run
+  DLTOBJ OBJ(&INTOLIB/Source) OBJTYPE(*FILE)
   DLTOBJ OBJ(QTEMP/GITLOG) OBJTYPE(*FILE)
