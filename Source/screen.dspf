@@ -73,12 +73,21 @@
      A                                  2  3'giti'
      A                                      COLOR(RED)
      A            CMTHSH         7   O  6 21
-     A                                  6 12'Hash:'
+     A                                  6  9'Hash:'
+     A                                      COLOR(WHT)
      A            CMTAUT        64   O 10  9
-     A                                  9 10'Author:'
-     A                                  7 12'Date:'
+     A                                  9  9'Author:'
+     A                                      COLOR(WHT)
+     A                                  7  9'Date:'
+     A                                      COLOR(WHT)
      A            CMTDTE        30   O  7 21
      A            CMTMSG1       64   O 13  9
      A                                 12  9'Message:'
+     A                                      COLOR(WHT)
      A            CMTMSG2       64     14  9
+     A                                  2 68'Commit View'
+     A                                      COLOR(WHT)
+     A                                 20 11'F12=Return F6=Revert (no-commit) F-
+     A                                      7=Tag'
+     A                                      COLOR(BLU)
  
