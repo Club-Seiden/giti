@@ -375,6 +375,16 @@ Dcl-Proc giti_DisplayBranches;
     lOpt(9)  = BIN9;
     lOpt(10) = BIN10;
 
+    If (BIN0 = '5');
+      //Create new branch
+      If (BNAME0 <> *Blank);
+        PASE('/QOpenSys/usr/bin/-sh' + x'00'
+             :'git checkout -b ' + %Trim(BNAME0) + x'00');
+        lExit = *On;
+        Return;
+      Endif;
+    ENDIF;
+
     For lIndex = 1 to 10;
       If (lBranches(lIndex).Name = *Blank);
         Iter;
@@ -395,6 +405,7 @@ Dcl-Proc giti_DisplayBranches;
   ENDSR;
 
   Begsr LoadData;
+    BIN0  = *Blank;
     BIN1  = *Blank;
     BIN2  = *Blank;
     BIN3  = *Blank;
@@ -406,6 +417,7 @@ Dcl-Proc giti_DisplayBranches;
     BIN9  = *Blank;
     BIN10 = *Blank;
 
+    BNAME0  = *Blank;
     BNAME1  = lBranches(1).Name;
     BNAME2  = lBranches(2).Name;
     BNAME3  = lBranches(3).Name;
