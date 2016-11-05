@@ -335,6 +335,10 @@ Dcl-Proc giti_DisplayCommit;
     Select;
       When (*In12);
         lExit = *On;
+      When (*In06);
+        PASE('/QOpenSys/usr/bin/-sh' + x'00'
+             :'git revert ' + CMTHSH + ' --no-commit' + x'00');
+        lExit = *On;
       Other;
         //Nothing
     ENDSL;
