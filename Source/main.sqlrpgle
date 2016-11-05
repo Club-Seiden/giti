@@ -183,6 +183,8 @@ Dcl-Proc giti_LoadScreen;
       Select;
         When (lOpt(lOptInd) = '5');
           giti_DisplayCommit(gCommits(lIndex + (lOptInd-1)).Hash);
+        When (lOpt(lOptInd) = '7');
+          giti_ResetToCommit(gCommits(lIndex + (lOptInd-1)).Hash);
       ENDSL;
     ENDFOR;
   ENDSR;
@@ -487,4 +489,18 @@ Dcl-Proc giti_DisplayBranches;
       BACT10 = '>';
     ENDIF;
   Endsr;
+END-PROC;
+
+//******************
+
+Dcl-Proc giti_ResetToCommit;
+  Dcl-Pi *N;
+    pHash Char(7) Const;
+  END-PI;
+
+  PASE('/QOpenSys/usr/bin/-sh' + x'00'
+      :'git reset --hard ' + pHash + x'00');
+
+  GitLogParse(gFile:gValid);
+  giti_LoadCommits();
 END-PROC;

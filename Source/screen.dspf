@@ -72,7 +72,7 @@
      A                                      COLOR(RED)
      A                                 22 11'F6=Branches'
      A                                      COLOR(BLU)
-     A                                  4 11'5=View'
+     A                                  4 11'5=View, 7=Reset branch to here'
      A                                      COLOR(BLU)
      A          R CMTDSP                    CA12(12)
      A                                  2  3'giti'
