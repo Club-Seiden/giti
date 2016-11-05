@@ -94,37 +94,38 @@
      A                                      7=Tag'
      A                                      COLOR(BLU)
      A          R BRANCHES                  CA12(12)
-     A                                  2  3'giti'
-     A                                      COLOR(RED)
-     A                                  2 68'Branch View'
+     A                                      WINDOW(3 42 17 29)
+     A                                  2 10'Branch View'
      A                                      COLOR(WHT)
-     A            BNAME1        20   O  6 26
-     A            BNAME2        20   O  7 26
-     A            BNAME3        20   O  8 26
-     A            BNAME4        20   O  9 26
-     A            BNAME5        20   O 10 26
-     A            BNAME6        20   O 11 26
-     A            BNAME7        20   O 12 26
-     A            BNAME8        20   O 13 26
-     A            BNAME9        20   O 14 26
-     A            BNAME10       20   O 15 26
-     A            BIN1           2   B  6 21COLOR(WHT)
-     A            BIN2           2   B  7 21COLOR(WHT)
-     A            BIN3           2   B  8 21COLOR(WHT)
-     A            BIN4           2   B  9 21COLOR(WHT)
-     A            BIN5           2   B 10 21COLOR(WHT)
-     A            BIN6           2   B 11 21COLOR(WHT)
-     A            BIN7           2   B 12 21COLOR(WHT)
-     A            BIN8           2   B 13 21COLOR(WHT)
-     A            BIN9           2   B 14 21COLOR(WHT)
-     A            BIN10          2   B 15 21COLOR(WHT)
-     A            BACT1          6   O  6 52COLOR(RED)
-     A            BACT2          6      7 52COLOR(RED)
-     A            BACT3          6      8 52COLOR(RED)
-     A            BACT4          6      9 52COLOR(RED)
-     A            BACT5          6     10 52COLOR(RED)
-     A            BACT6          6     11 52COLOR(RED)
-     A            BACT7          6     12 52COLOR(RED)
-     A            BACT8          6     13 52COLOR(RED)
-     A            BACT9          6     14 52COLOR(RED)
-     A            BACT10         6     15 52COLOR(RED)
+     A            BNAME1        20   O  4  8
+     A            BNAME2        20   O  5  8
+     A            BNAME3        20   O  6  8
+     A            BNAME4        20   O  7  8
+     A            BNAME5        20   O  8  8
+     A            BNAME6        20   O  9  8
+     A            BNAME7        20   O 10  8
+     A            BNAME8        20   O 11  8
+     A            BNAME9        20   O 12  8
+     A            BNAME10       20   O 13  8
+     A            BIN1           2   B  4  3COLOR(WHT)
+     A            BIN2           2   B  5  3COLOR(WHT)
+     A            BIN3           2   B  6  3COLOR(WHT)
+     A            BIN4           2   B  7  3COLOR(WHT)
+     A            BIN5           2   B  8  3COLOR(WHT)
+     A            BIN6           2   B  9  3COLOR(WHT)
+     A            BIN7           2   B 10  3COLOR(WHT)
+     A            BIN8           2   B 11  3COLOR(WHT)
+     A            BIN9           2   B 12  3COLOR(WHT)
+     A            BIN10          2   B 13  3COLOR(WHT)
+     A            BACT1          1   O  4  6COLOR(PNK)
+     A            BACT2          1      5  6COLOR(PNK)
+     A            BACT3          1      6  6COLOR(PNK)
+     A            BACT4          1      7  6COLOR(PNK)
+     A            BACT5          1      8  6COLOR(PNK)
+     A            BACT6          1      9  6COLOR(PNK)
+     A            BACT7          1     10  6COLOR(PNK)
+     A            BACT8          1     11  6COLOR(PNK)
+     A            BACT9          1     12  6COLOR(PNK)
+     A            BACT10         1     13  6COLOR(PNK)
+     A                                 16  6'5=Select, F12=Cancel'
+     A                                      COLOR(BLU)
