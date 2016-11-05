@@ -14,6 +14,6 @@ Simply run: `RELICGET PLOC('https://github.com/Club-Seiden/giti/archive/master.z
 
 The display has three columns: the commit author, date and message. There is only a single entry field in the program at the moment, which is the 'file' field. You can enter in a file within the repository in which you would like to find the commits for. Currently, the option parameter for each commit does not function.
 
-![Using giti on the giti repo](http://i.imgur.com/RKApXjU.png)
+![Using giti on the giti repo](http://i.imgur.com/3WuncIn.png)
 ![Using giti to look at a commit](http://i.imgur.com/cgUu7Lb.png)
-![Using giti to select a branch](http://i.imgur.com/CIpAaP3.png)
+![Using giti to select a branch](http://i.imgur.com/fuiqK4H.png)

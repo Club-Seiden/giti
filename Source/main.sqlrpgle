@@ -183,6 +183,8 @@ Dcl-Proc giti_LoadScreen;
       Select;
         When (lOpt(lOptInd) = '5');
           giti_DisplayCommit(gCommits(lIndex + (lOptInd-1)).Hash);
+        When (lOpt(lOptInd) = '7');
+          giti_ResetToCommit(gCommits(lIndex + (lOptInd-1)).Hash);
       ENDSL;
     ENDFOR;
   ENDSR;
@@ -333,6 +335,10 @@ Dcl-Proc giti_DisplayCommit;
     Select;
       When (*In12);
         lExit = *On;
+      When (*In06);
+        PASE('/QOpenSys/usr/bin/-sh' + x'00'
+             :'git revert ' + CMTHSH + ' --no-commit' + x'00');
+        lExit = *On;
       Other;
         //Nothing
     ENDSL;
@@ -373,6 +379,16 @@ Dcl-Proc giti_DisplayBranches;
     lOpt(9)  = BIN9;
     lOpt(10) = BIN10;
 
+    If (BIN0 = '5');
+      //Create new branch
+      If (BNAME0 <> *Blank);
+        PASE('/QOpenSys/usr/bin/-sh' + x'00'
+             :'git checkout -b ' + %Trim(BNAME0) + x'00');
+        lExit = *On;
+        Return;
+      Endif;
+    ENDIF;
+
     For lIndex = 1 to 10;
       If (lBranches(lIndex).Name = *Blank);
         Iter;
@@ -393,6 +409,7 @@ Dcl-Proc giti_DisplayBranches;
   ENDSR;
 
   Begsr LoadData;
+    BIN0  = *Blank;
     BIN1  = *Blank;
     BIN2  = *Blank;
     BIN3  = *Blank;
@@ -404,6 +421,7 @@ Dcl-Proc giti_DisplayBranches;
     BIN9  = *Blank;
     BIN10 = *Blank;
 
+    BNAME0  = *Blank;
     BNAME1  = lBranches(1).Name;
     BNAME2  = lBranches(2).Name;
     BNAME3  = lBranches(3).Name;
@@ -487,4 +505,18 @@ Dcl-Proc giti_DisplayBranches;
       BACT10 = '>';
     ENDIF;
   Endsr;
+END-PROC;
+
+//******************
+
+Dcl-Proc giti_ResetToCommit;
+  Dcl-Pi *N;
+    pHash Char(7) Const;
+  END-PI;
+
+  PASE('/QOpenSys/usr/bin/-sh' + x'00'
+      :'git reset --hard ' + pHash + x'00');
+
+  GitLogParse(gFile:gValid);
+  giti_LoadCommits();
 END-PROC;
