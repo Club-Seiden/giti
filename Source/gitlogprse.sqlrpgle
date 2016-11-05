@@ -136,6 +136,8 @@ Dow (ReadFile(%addr(gGitLog.RtvData)
   gGitLog.RtvData = '';
 Enddo;
 
+CloseFile(gGitLog.FilePtr);
+
 If (gRecords = 0);
   pValid = *Off;
   showMessage('The file you provided may be invalid.');

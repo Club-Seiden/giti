@@ -10,6 +10,24 @@ Dcl-Pr GitLogParse ExtPgm('GITLOGPRSE');
   *N Ind;       //Pass in gValid
 End-Pr;
 
+Dcl-Pr GitBranch ExtPgm('GITBRANCH');
+  pBranches LikeDS(Branches_Template) Dim(10);
+End-Pr;
+
+Dcl-Pr PASE ExtPgm('QP2SHELL2');
+  Path   Char(32) Const;
+  Script Char(128) Const;
+END-PR;
+
+//***************************
+
+Dcl-Ds Branches_Template Qualified Template;
+  Name   Char(20);
+  Active Ind;
+END-DS;
+
+//***************************
+
 Dcl-S  gCmtCnt  Int(5);
 Dcl-Ds gCommits Qualified Dim(50);
   Hash   Char(7);
@@ -17,6 +35,8 @@ Dcl-Ds gCommits Qualified Dim(50);
   Date   Char(64);
   Text   Char(128);
 End-Ds;
+
+//***************************
 
 Dcl-S gValid Ind       Inz(*On);
 Dcl-S gFile  Char(128) Inz('*ALL');
@@ -99,12 +119,15 @@ Dcl-Proc giti_LoadScreen;
     EXFMT Main;
 
     Select;
+      When (*In06);
+        giti_DisplayBranches();
+
       When (*In12);
         lExit = *On;
 
       When (*In44); //Page up
         If (lIndex - 15 < 1);
-          MSG = 'Start of data';
+          MSG = 'Start of data.';
           lIndex = 1;
         Else;
           MSG = *Blank;
@@ -114,7 +137,10 @@ Dcl-Proc giti_LoadScreen;
       When (*In66); //Page down
         If ((lIndex + 15) + 15 > gCmtCnt);
           lIndex = gCmtCnt - 15;
-          MSG = 'End of data';
+          If (lIndex < 1);
+            lIndex = 1;
+          ENDIF;
+          MSG = 'End of data.';
         Else;
           MSG = *Blank;
           lIndex += 15;
@@ -311,4 +337,154 @@ Dcl-Proc giti_DisplayCommit;
         //Nothing
     ENDSL;
   ENDDO;
+END-PROC;
+
+//**************************
+
+Dcl-Proc giti_DisplayBranches;
+  Dcl-Ds lBranches LikeDS(Branches_Template) Dim(10);
+  Dcl-S  lExit     Ind     Inz(*Off);
+  Dcl-S  lOpt      Char(2) Dim(10);
+  Dcl-S  lIndex    Int(3);
+
+  GitBranch(lBranches);
+  Dow (lExit = *Off);
+    Exsr LoadData;
+    Exfmt BRANCHES;
+
+    Select;
+      When (*In12);
+        lExit = *On;
+
+      Other;
+        Exsr CheckInput;
+    ENDSL;
+  ENDDO;
+
+  Begsr CheckInput;
+    lOpt(1)  = BIN1;
+    lOpt(2)  = BIN2;
+    lOpt(3)  = BIN3;
+    lOpt(4)  = BIN4;
+    lOpt(5)  = BIN5;
+    lOpt(6)  = BIN6;
+    lOpt(7)  = BIN7;
+    lOpt(8)  = BIN8;
+    lOpt(9)  = BIN9;
+    lOpt(10) = BIN10;
+
+    For lIndex = 1 to 10;
+      If (lBranches(lIndex).Name = *Blank);
+        Iter;
+      ENDIF;
+
+      Select;
+        When (lOpt(lIndex) = 'D');
+          //Delete branch
+        When (lOpt(lIndex) = '5');
+          PASE('/QOpenSys/usr/bin/-sh' + x'00'
+              :'git checkout ' + %TrimR(lBranches(lIndex).Name) + x'00');
+          GitLogParse(gFile:gValid);
+          giti_LoadCommits();
+          lExit = *On;
+          Return; //exit proc
+      ENDSL;
+    ENDFOR;
+  ENDSR;
+
+  Begsr LoadData;
+    BIN1  = *Blank;
+    BIN2  = *Blank;
+    BIN3  = *Blank;
+    BIN4  = *Blank;
+    BIN5  = *Blank;
+    BIN6  = *Blank;
+    BIN7  = *Blank;
+    BIN8  = *Blank;
+    BIN9  = *Blank;
+    BIN10 = *Blank;
+
+    BNAME1  = lBranches(1).Name;
+    BNAME2  = lBranches(2).Name;
+    BNAME3  = lBranches(3).Name;
+    BNAME4  = lBranches(4).Name;
+    BNAME5  = lBranches(5).Name;
+    BNAME6  = lBranches(6).Name;
+    BNAME7  = lBranches(7).Name;
+    BNAME8  = lBranches(8).Name;
+    BNAME9  = lBranches(9).Name;
+    BNAME10 = lBranches(10).Name;
+
+    BACT1  = *Blank;
+    BACT2  = *Blank;
+    BACT3  = *Blank;
+    BACT4  = *Blank;
+    BACT5  = *Blank;
+    BACT6  = *Blank;
+    BACT8  = *Blank;
+    BACT9  = *Blank;
+    BACT10 = *Blank;
+
+    If (BNAME1 = *Blank);
+      BIN1 = x'2F';
+    ENDIF;
+    If (BNAME2 = *Blank);
+      BIN2 = x'2F';
+    ENDIF;
+    If (BNAME3 = *Blank);
+      BIN3 = x'2F';
+    ENDIF;
+    If (BNAME4 = *Blank);
+      BIN4 = x'2F';
+    ENDIF;
+    If (BNAME5 = *Blank);
+      BIN5 = x'2F';
+    ENDIF;
+    If (BNAME6 = *Blank);
+      BIN6 = x'2F';
+    ENDIF;
+    If (BNAME7 = *Blank);
+      BIN7 = x'2F';
+    ENDIF;
+    If (BNAME8 = *Blank);
+      BIN8 = x'2F';
+    ENDIF;
+    If (BNAME9 = *Blank);
+      BIN9 = x'2F';
+    ENDIF;
+    If (BNAME10 = *Blank);
+      BIN10 = x'2F';
+    ENDIF;
+
+    If (lBranches(1).Active);
+      BACT1 = '>';
+    ENDIF;
+    If (lBranches(2).Active);
+      BACT2 = '>';
+    ENDIF;
+    If (lBranches(3).Active);
+      BACT3 = '>';
+    ENDIF;
+    If (lBranches(4).Active);
+      BACT4 = '>';
+    ENDIF;
+    If (lBranches(5).Active);
+      BACT5 = '>';
+    ENDIF;
+    If (lBranches(6).Active);
+      BACT6 = '>';
+    ENDIF;
+    If (lBranches(7).Active);
+      BACT7 = '>';
+    ENDIF;
+    If (lBranches(8).Active);
+      BACT8 = '>';
+    ENDIF;
+    If (lBranches(9).Active);
+      BACT9 = '>';
+    ENDIF;
+    If (lBranches(10).Active);
+      BACT10 = '>';
+    ENDIF;
+  Endsr;
 END-PROC;
