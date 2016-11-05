@@ -137,6 +137,9 @@ Dcl-Proc giti_LoadScreen;
       When (*In66); //Page down
         If ((lIndex + 15) + 15 > gCmtCnt);
           lIndex = gCmtCnt - 15;
+          If (lIndex < 1);
+            lIndex = 1;
+          ENDIF;
           MSG = 'End of data.';
         Else;
           MSG = *Blank;

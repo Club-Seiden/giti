@@ -16,3 +16,4 @@ The display has three columns: the commit author, date and message. There is onl
 
 ![Using giti on the giti repo](http://i.imgur.com/RKApXjU.png)
 ![Using giti to look at a commit](http://i.imgur.com/cgUu7Lb.png)
+![Using giti to select a branch](http://i.imgur.com/CIpAaP3.png)
