@@ -14,6 +14,11 @@ Dcl-Pr GitBranch ExtPgm('GITBRANCH');
   pBranches LikeDS(Branches_Template) Dim(10);
 End-Pr;
 
+Dcl-Pr PASE ExtPgm('QP2SHELL2');
+  Path   Char(32) Const;
+  Script Char(128) Const;
+END-PR;
+
 //***************************
 
 Dcl-Ds Branches_Template Qualified Template;
@@ -335,7 +340,9 @@ END-PROC;
 
 Dcl-Proc giti_DisplayBranches;
   Dcl-Ds lBranches LikeDS(Branches_Template) Dim(10);
-  Dcl-S  lExit     Ind Inz(*Off);
+  Dcl-S  lExit     Ind     Inz(*Off);
+  Dcl-S  lOpt      Char(2) Dim(10);
+  Dcl-S  lIndex    Int(3);
 
   GitBranch(lBranches);
   Dow (lExit = *Off);
@@ -347,9 +354,40 @@ Dcl-Proc giti_DisplayBranches;
         lExit = *On;
 
       Other;
-        //Handle input
+        Exsr CheckInput;
     ENDSL;
   ENDDO;
+
+  Begsr CheckInput;
+    lOpt(1)  = BIN1;
+    lOpt(2)  = BIN2;
+    lOpt(3)  = BIN3;
+    lOpt(4)  = BIN4;
+    lOpt(5)  = BIN5;
+    lOpt(6)  = BIN6;
+    lOpt(7)  = BIN7;
+    lOpt(8)  = BIN8;
+    lOpt(9)  = BIN9;
+    lOpt(10) = BIN10;
+
+    For lIndex = 1 to 10;
+      If (lBranches(lIndex).Name = *Blank);
+        Iter;
+      ENDIF;
+
+      Select;
+        When (lOpt(lIndex) = 'D');
+          //Delete branch
+        When (lOpt(lIndex) = '5');
+          PASE('/QOpenSys/usr/bin/-sh' + x'00'
+              :'git checkout ' + %TrimR(lBranches(lIndex).Name) + x'00');
+          GitLogParse(gFile:gValid);
+          giti_LoadCommits();
+          lExit = *On;
+          Return; //exit proc
+      ENDSL;
+    ENDFOR;
+  ENDSR;
 
   Begsr LoadData;
     BIN1  = *Blank;
