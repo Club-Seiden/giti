@@ -1,14 +1,10 @@
 **FREE
-Ctl-Opt DftActGrp(*No) ActGrp(*NEW);
+Ctl-Opt NoMain;
 
 Dcl-Ds Branches_Template Qualified Template;
   Name   Char(20);
   Active Ind;
 END-DS;
-
-Dcl-Pi GITBRANCH;
-  pBranches LikeDS(Branches_Template) Dim(10);
-End-Pi;
 
 //************************
 
@@ -50,45 +46,51 @@ Dcl-Ds gBrnchFile LikeDS(File_Temp);
 Dcl-S gUser  Char(10) Inz(*User);
 Dcl-S gIndex Int(3) Inz(1);
 
-gBrnchFile.PathFile = '/tmp/' + %TrimR(gUser) + 'brnch.log';
-PASE('/QOpenSys/usr/bin/-sh' + x'00'
-    :'git branch --list > '
-    + %TrimR(gBrnchFile.PathFile) + ' 2>&1' + x'00');
+Dcl-Proc GITBRANCH Export;
+  Dcl-Pi GITBRANCH;
+    pBranches LikeDS(Branches_Template) Dim(10);
+  End-Pi;
 
-//Next we will want to read that stream file
-gBrnchFile.PathFile    = %TrimR(gBrnchFile.PathFile) + x'00';
-gBrnchFile.OpenMode = 'r' + x'00';
-gBrnchFile.FilePtr  = OpenFile(%addr(gBrnchFile.PathFile)
-                              :%addr(gBrnchFile.OpenMode));
+  gBrnchFile.PathFile = '/tmp/' + %TrimR(gUser) + 'brnch.log';
+  PASE('/QOpenSys/usr/bin/-sh' + x'00'
+      :'git branch --list > '
+      + %TrimR(gBrnchFile.PathFile) + ' 2>&1' + x'00');
 
-If (gBrnchFile.FilePtr = *Null);
-  //File didn't open?
-  Return;
-ENDIF;
+  //Next we will want to read that stream file
+  gBrnchFile.PathFile    = %TrimR(gBrnchFile.PathFile) + x'00';
+  gBrnchFile.OpenMode = 'r' + x'00';
+  gBrnchFile.FilePtr  = OpenFile(%addr(gBrnchFile.PathFile)
+                                :%addr(gBrnchFile.OpenMode));
 
-gIndex = 1;
-Dow (ReadFile(%addr(gBrnchFile.RtvData)
-             :%Len(gBrnchFile.RtvData)
-             :gBrnchFile.FilePtr) <> *null);
-
-  gBrnchFile.RtvData = %xlate(x'00':' ':gBrnchFile.RtvData);//End of record null
-  gBrnchFile.RtvData = %xlate(x'25':' ':gBrnchFile.RtvData);//Line feed (LF)
-  gBrnchFile.RtvData = %xlate(x'0D':' ':gBrnchFile.RtvData);//Carriage return (CR)
-  gBrnchFile.RtvData = %xlate(x'05':' ':gBrnchFile.RtvData);//Tab
-
-  If (%Subst(gBrnchFile.RtvData:1:1) = '*');
-    pBranches(gIndex).Active = *On;
-  Else;
-    pBranches(gIndex).Active = *Off;
+  If (gBrnchFile.FilePtr = *Null);
+    //File didn't open?
+    Return;
   ENDIF;
 
-  pBranches(gIndex).Name = %Subst(gBrnchFile.RtvData:3);
-  gIndex += 1;
+  gIndex = 1;
+  Dow (ReadFile(%addr(gBrnchFile.RtvData)
+               :%Len(gBrnchFile.RtvData)
+               :gBrnchFile.FilePtr) <> *null);
 
-  gBrnchFile.RtvData = '';
-Enddo;
+    gBrnchFile.RtvData = %xlate(x'00':' ':gBrnchFile.RtvData);//End of record null
+    gBrnchFile.RtvData = %xlate(x'25':' ':gBrnchFile.RtvData);//Line feed (LF)
+    gBrnchFile.RtvData = %xlate(x'0D':' ':gBrnchFile.RtvData);//Carriage return (CR)
+    gBrnchFile.RtvData = %xlate(x'05':' ':gBrnchFile.RtvData);//Tab
 
-CloseFile(gBrnchFile.FilePtr);
+    If (%Subst(gBrnchFile.RtvData:1:1) = '*');
+      pBranches(gIndex).Active = *On;
+    Else;
+      pBranches(gIndex).Active = *Off;
+    ENDIF;
 
-*InLR = *On;
-Return;
+    pBranches(gIndex).Name = %Subst(gBrnchFile.RtvData:3);
+    gIndex += 1;
+
+    gBrnchFile.RtvData = '';
+  Enddo;
+
+  CloseFile(gBrnchFile.FilePtr);
+
+  *InLR = *On;
+  Return;
+End-Proc;

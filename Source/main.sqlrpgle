@@ -1,16 +1,15 @@
 **FREE
-Ctl-Opt DftActGrp(*No) ActGrp(*NEW);
 
 Dcl-F SCREEN Workstn;
 
 //GitLogParse is used to look for all commits
 //or for a specific file in the repo.
-Dcl-Pr GitLogParse ExtPgm('GITLOGPRSE');
+Dcl-Pr GitLogParse ExtProc('GITLOGPRSE');
   *N Char(128); //Pass in gFile
   *N Ind;       //Pass in gValid
 End-Pr;
 
-Dcl-Pr GitBranch ExtPgm('GITBRANCH');
+Dcl-Pr GitBranch ExtProc('GITBRANCH');
   pBranches LikeDS(Branches_Template) Dim(10);
 End-Pr;
 

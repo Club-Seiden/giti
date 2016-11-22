@@ -1,10 +1,5 @@
 **FREE
-Ctl-Opt DftActGrp(*No) ActGrp(*NEW);
-
-Dcl-Pi GITLOGPRSE;
-  pFile  Char(128);
-  pValid Ind;
-End-Pi;
+Ctl-Opt NoMain;
 
 //************************
 
@@ -59,94 +54,101 @@ End-Ds;
 Dcl-S gUser  Char(10) Inz(*User);
 Dcl-S gFocus Varchar(128);
 
-gFocus = %Trim(pFile);
-If (gFocus = '*ALL');
-  gFocus = '';
-Elseif (gFocus <> '');
-  gFocus = ' -- ' + gFocus;
-Endif;
+Dcl-Proc GITLOGPRSE Export;
+  Dcl-Pi GITLOGPRSE;
+    pFile  Char(128);
+    pValid Ind;
+  End-Pi;
 
-gGitLog.PathFile = '/tmp/' + %TrimR(gUser) + 'git.log';
+  gFocus = %Trim(pFile);
+  If (gFocus = '*ALL');
+    gFocus = '';
+  Elseif (gFocus <> '');
+    gFocus = ' -- ' + gFocus;
+  Endif;
 
-//Program will assume CURDIR is git repo
+  gGitLog.PathFile = '/tmp/' + %TrimR(gUser) + 'git.log';
 
-//First we need to take the content of GIT LOG into a stream file
-PASE('/QOpenSys/usr/bin/-sh' + x'00'
-    :'git --no-pager log ' + gFocus + ' > '
-    + %TrimR(gGitLog.PathFile) + ' 2>&1' + x'00');
+  //Program will assume CURDIR is git repo
 
-//Next we will want to read that stream file
-gGitLog.PathFile    = %TrimR(gGitLog.PathFile) + x'00';
-gGitLog.OpenMode = 'r' + x'00';
-gGitLog.FilePtr  = OpenFile(%addr(gGitLog.PathFile)
-                           :%addr(gGitLog.OpenMode));
+  //First we need to take the content of GIT LOG into a stream file
+  PASE('/QOpenSys/usr/bin/-sh' + x'00'
+      :'git --no-pager log ' + gFocus + ' > '
+      + %TrimR(gGitLog.PathFile) + ' 2>&1' + x'00');
 
-If (gGitLog.FilePtr = *Null);
-  //Failed to open file
-  Return;
-ENDIF;
+  //Next we will want to read that stream file
+  gGitLog.PathFile    = %TrimR(gGitLog.PathFile) + x'00';
+  gGitLog.OpenMode = 'r' + x'00';
+  gGitLog.FilePtr  = OpenFile(%addr(gGitLog.PathFile)
+                             :%addr(gGitLog.OpenMode));
 
-gIsText = *Off;
-Log_Clear();
-
-Dow (ReadFile(%addr(gGitLog.RtvData)
-             :%Len(gGitLog.RtvData)
-             :gGitLog.FilePtr) <> *null);
-
-  If (%Subst(gGitLog.RtvData:1:1) = x'25');
-    gIsText = *On;
-    Iter;
+  If (gGitLog.FilePtr = *Null);
+    //Failed to open file
+    Return;
   ENDIF;
 
-  gGitLog.RtvData = %xlate(x'00':' ':gGitLog.RtvData);//End of record null
-  gGitLog.RtvData = %xlate(x'25':' ':gGitLog.RtvData);//Line feed (LF)
-  gGitLog.RtvData = %xlate(x'0D':' ':gGitLog.RtvData);//Carriage return (CR)
-  gGitLog.RtvData = %xlate(x'05':' ':gGitLog.RtvData);//Tab
+  gIsText = *Off;
+  Log_Clear();
 
-  gKey = %Subst(gGitLog.RtvData:1:6);
+  Dow (ReadFile(%addr(gGitLog.RtvData)
+               :%Len(gGitLog.RtvData)
+               :gGitLog.FilePtr) <> *null);
 
-  Select;
-    When (gKey = 'commit');
-      if (gIsText = *On);
-        //Last commit finished, write to file?
-        gLogEntry.Text = gText;
-        Log_Commit();
-        Clear gText;
-        Clear gLogEntry;
-        gIsText = *Off;
-      ENDIF;
-      gLogEntry.Hash = %Subst(gGitLog.RtvData:8:7);
-
-    When (gKey = 'Author');
-      gLogEntry.Author = %Subst(gGitLog.RtvData:9);
-
-    When (gKey = 'Date:');
-      gLogEntry.Date = %Subst(gGitLog.RtvData:9);
-
-    When (gGitLog.RtvData = *Blank);
+    If (%Subst(gGitLog.RtvData:1:1) = x'25');
       gIsText = *On;
+      Iter;
+    ENDIF;
 
-    Other;
-      If (gIsText);
-        gText += %Trim(gGitLog.RtvData) + ' ';
-      ENDIF;
+    gGitLog.RtvData = %xlate(x'00':' ':gGitLog.RtvData);//End of record null
+    gGitLog.RtvData = %xlate(x'25':' ':gGitLog.RtvData);//Line feed (LF)
+    gGitLog.RtvData = %xlate(x'0D':' ':gGitLog.RtvData);//Carriage return (CR)
+    gGitLog.RtvData = %xlate(x'05':' ':gGitLog.RtvData);//Tab
 
-  ENDSL;
+    gKey = %Subst(gGitLog.RtvData:1:6);
 
-  gGitLog.RtvData = '';
-Enddo;
+    Select;
+      When (gKey = 'commit');
+        if (gIsText = *On);
+          //Last commit finished, write to file?
+          gLogEntry.Text = gText;
+          Log_Commit();
+          Clear gText;
+          Clear gLogEntry;
+          gIsText = *Off;
+        ENDIF;
+        gLogEntry.Hash = %Subst(gGitLog.RtvData:8:7);
 
-CloseFile(gGitLog.FilePtr);
+      When (gKey = 'Author');
+        gLogEntry.Author = %Subst(gGitLog.RtvData:9);
 
-If (gRecords = 0);
-  pValid = *Off;
-  showMessage('The file you provided may be invalid.');
-Else;
-  pValid = *On;
-ENDIF;
+      When (gKey = 'Date:');
+        gLogEntry.Date = %Subst(gGitLog.RtvData:9);
 
-*InLR = *On;
-Return;
+      When (gGitLog.RtvData = *Blank);
+        gIsText = *On;
+
+      Other;
+        If (gIsText);
+          gText += %Trim(gGitLog.RtvData) + ' ';
+        ENDIF;
+
+    ENDSL;
+
+    gGitLog.RtvData = '';
+  Enddo;
+
+  CloseFile(gGitLog.FilePtr);
+
+  If (gRecords = 0);
+    pValid = *Off;
+    showMessage('The file you provided may be invalid.');
+  Else;
+    pValid = *On;
+  ENDIF;
+
+  *InLR = *On;
+  Return;
+End-Proc;
 
 Dcl-Proc Log_Clear;
   EXEC SQL
