@@ -18,8 +18,8 @@ dcl-pr CloseFile extproc('_C_IFS_fclose');
  *n pointer value;  //Misc pointer
 end-pr;
 
-Dcl-Pr PASE;
-  pCmd Char(1024) Const;
+Dcl-Pr PASE ExtProc('GITI_PASECALL');
+  pCommand Char(1024) Const;
 END-PR;
 
 //************************

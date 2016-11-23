@@ -9,7 +9,7 @@ Dcl-Pr PASECall ExtPgm('QP2SHELL2');
   Script Char(1024) Const;
 END-PR;
 
-Dcl-Proc Pase Export;
+Dcl-Proc giti_PaseCall Export;
   Dcl-Pi *N;
     pCommand Char(1024) Const;
   END-PI;

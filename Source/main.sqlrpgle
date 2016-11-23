@@ -13,8 +13,8 @@ Dcl-Pr GitBranch ExtProc('GITBRANCH');
   pBranches LikeDS(Branches_Template) Dim(10);
 End-Pr;
 
-Dcl-Pr PASE;
-  pCmd Char(1024) Const;
+Dcl-Pr PASE ExtProc('GITI_PASECALL');
+  pCommand Char(1024) Const;
 END-PR;
 
 //***************************
