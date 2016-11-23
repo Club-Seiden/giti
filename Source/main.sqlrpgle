@@ -13,9 +13,8 @@ Dcl-Pr GitBranch ExtProc('GITBRANCH');
   pBranches LikeDS(Branches_Template) Dim(10);
 End-Pr;
 
-Dcl-Pr PASE ExtPgm('QP2SHELL2');
-  Path   Char(32) Const;
-  Script Char(128) Const;
+Dcl-Pr PASE;
+  pCmd Char(1024) Const;
 END-PR;
 
 //***************************
@@ -54,9 +53,7 @@ EXEC SQL
     commit_text char(128) not null
   );
 
-If (SQLSTATE = '00000');
-  GitLogParse(gFile:gValid);
-ENDIF;
+GitLogParse(gFile:gValid);
 
 giti_LoadCommits();
 giti_LoadScreen();
@@ -335,8 +332,7 @@ Dcl-Proc giti_DisplayCommit;
       When (*In12);
         lExit = *On;
       When (*In06);
-        PASE('/QOpenSys/usr/bin/-sh' + x'00'
-             :'git revert ' + CMTHSH + ' --no-commit' + x'00');
+        PASE('git revert ' + CMTHSH + ' --no-commit');
         lExit = *On;
       Other;
         //Nothing
@@ -381,8 +377,7 @@ Dcl-Proc giti_DisplayBranches;
     If (BIN0 = '5');
       //Create new branch
       If (BNAME0 <> *Blank);
-        PASE('/QOpenSys/usr/bin/-sh' + x'00'
-             :'git checkout -b ' + %Trim(BNAME0) + x'00');
+        PASE('git checkout -b ' + %Trim(BNAME0));
         lExit = *On;
         Return;
       Endif;
@@ -397,8 +392,7 @@ Dcl-Proc giti_DisplayBranches;
         When (lOpt(lIndex) = 'D');
           //Delete branch
         When (lOpt(lIndex) = '5');
-          PASE('/QOpenSys/usr/bin/-sh' + x'00'
-              :'git checkout ' + %TrimR(lBranches(lIndex).Name) + x'00');
+          PASE('git checkout ' + %TrimR(lBranches(lIndex).Name));
           GitLogParse(gFile:gValid);
           giti_LoadCommits();
           lExit = *On;
@@ -513,8 +507,7 @@ Dcl-Proc giti_ResetToCommit;
     pHash Char(7) Const;
   END-PI;
 
-  PASE('/QOpenSys/usr/bin/-sh' + x'00'
-      :'git reset --hard ' + pHash + x'00');
+  PASE('git reset --hard ' + pHash);
 
   GitLogParse(gFile:gValid);
   giti_LoadCommits();

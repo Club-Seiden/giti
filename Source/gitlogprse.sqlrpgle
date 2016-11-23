@@ -18,10 +18,8 @@ dcl-pr CloseFile extproc('_C_IFS_fclose');
  *n pointer value;  //Misc pointer
 end-pr;
 
-Dcl-Pr PASE ExtPgm('QP2SHELL2');
-  Path   Char(32) Const;
-  Script Char(128) Const;
-  //Pgms   Char(20) Const;
+Dcl-Pr PASE;
+  pCmd Char(1024) Const;
 END-PR;
 
 //************************
@@ -72,9 +70,8 @@ Dcl-Proc GITLOGPRSE Export;
   //Program will assume CURDIR is git repo
 
   //First we need to take the content of GIT LOG into a stream file
-  PASE('/QOpenSys/usr/bin/-sh' + x'00'
-      :'git --no-pager log ' + gFocus + ' > '
-      + %TrimR(gGitLog.PathFile) + ' 2>&1' + x'00');
+  PASE('git --no-pager log ' + gFocus + ' > '
+      + %TrimR(gGitLog.PathFile) + ' 2>&1');
 
   //Next we will want to read that stream file
   gGitLog.PathFile    = %TrimR(gGitLog.PathFile) + x'00';

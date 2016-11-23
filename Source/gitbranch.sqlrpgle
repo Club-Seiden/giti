@@ -23,9 +23,8 @@ dcl-pr CloseFile extproc('_C_IFS_fclose');
  *n pointer value;  //Misc pointer
 end-pr;
 
-Dcl-Pr PASE ExtPgm('QP2SHELL2');
-  Path   Char(32) Const;
-  Script Char(128) Const;
+Dcl-Pr PASE;
+  pCmd Char(1024) Const;
 END-PR;
 
 //************************
@@ -52,9 +51,8 @@ Dcl-Proc GITBRANCH Export;
   End-Pi;
 
   gBrnchFile.PathFile = '/tmp/' + %TrimR(gUser) + 'brnch.log';
-  PASE('/QOpenSys/usr/bin/-sh' + x'00'
-      :'git branch --list > '
-      + %TrimR(gBrnchFile.PathFile) + ' 2>&1' + x'00');
+  PASE('git branch --list > '
+      + %TrimR(gBrnchFile.PathFile) + ' 2>&1');
 
   //Next we will want to read that stream file
   gBrnchFile.PathFile    = %TrimR(gBrnchFile.PathFile) + x'00';
