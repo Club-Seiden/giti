@@ -2,7 +2,7 @@
 
 Ctl-Opt NoMain;
 
-Dcl-S gWithPath Ind Inz(*ON);
+Dcl-S gWithPath Ind Inz(*OFF);
 
 Dcl-Pr PASECall ExtPgm('QP2SHELL2');
   Path   Char(32) Const;
