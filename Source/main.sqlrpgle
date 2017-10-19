@@ -13,6 +13,10 @@ Dcl-Pr GitBranch ExtProc('GITBRANCH');
   pBranches LikeDS(Branches_Template) Dim(10);
 End-Pr;
 
+Dcl-Pr GitStatus ExtProc('GITSTATUS');
+  pStatuses LikeDS(Changes_Template) Dim(9);
+End-Pr;
+
 Dcl-Pr PASE ExtProc('GITI_PASECALL');
   pCommand Char(1024) Const;
 END-PR;
@@ -23,6 +27,11 @@ Dcl-Ds Branches_Template Qualified Template;
   Name   Char(20);
   Active Ind;
 END-DS;
+
+Dcl-Ds Changes_Template Qualified Template;
+  Type Char(1);
+  File Char(30);
+End-Ds;
 
 //***************************
 
@@ -117,6 +126,9 @@ Dcl-Proc giti_LoadScreen;
     Select;
       When (*In06);
         giti_DisplayBranches();
+        
+      When (*In07);
+        giti_DisplayChanges();
 
       When (*In12);
         lExit = *On;
@@ -499,6 +511,39 @@ Dcl-Proc giti_DisplayBranches;
     ENDIF;
   Endsr;
 END-PROC;
+
+//******************
+
+Dcl-Proc giti_DisplayChanges;
+  Dcl-Ds lChanges  LikeDS(Changes_Template) Dim(9);
+  Dcl-S  lExit     Ind     Inz(*Off);
+  
+  GitStatus(lChanges);
+  Exsr LoadChanges;
+  Exfmt MODLIST;
+  
+  Begsr LoadChanges;
+    MOD1 = lChanges(1).Type;
+    MOD2 = lChanges(2).Type;
+    MOD3 = lChanges(3).Type;
+    MOD4 = lChanges(4).Type;
+    MOD5 = lChanges(5).Type;
+    MOD6 = lChanges(6).Type;
+    MOD7 = lChanges(7).Type;
+    MOD8 = lChanges(8).Type;
+    MOD9 = lChanges(9).Type;
+    
+    FILE1 = lChanges(1).File;
+    FILE2 = lChanges(2).File;
+    FILE3 = lChanges(3).File;
+    FILE4 = lChanges(4).File;
+    FILE5 = lChanges(5).File;
+    FILE6 = lChanges(6).File;
+    FILE7 = lChanges(7).File;
+    FILE8 = lChanges(8).File;
+    FILE9 = lChanges(9).File;
+  Endsr;
+End-Proc;
 
 //******************
 

@@ -3,6 +3,7 @@
      A                                      ROLLDOWN(44)
      A                                      CA03(12)
      A                                      CA06(06)
+     A                                      CA07(07)
      A                                  2 31'File:'
      A            FILE          34   B  2 37COLOR(WHT)
      A                                      CHECK(LC)
@@ -134,3 +135,35 @@
      A                                      COLOR(BLU)
      A            BNAME0        20   B  4  8
      A            BIN0           2   B  4  3COLOR(WHT)
+     A          R MODLIST                   CA12(12)
+     A            MOD4           4   O  9 22
+     A            MOD5           4   O 10 22
+     A            MOD7           4   O 12 22
+     A            MOD6           4   O 11 22
+     A            MOD9           4   O 13 22
+     A            MOD8           4   O 14 22
+     A            MOD3           4   O  8 22
+     A            MOD2           4   O  7 22
+     A            MOD1           4   O  6 22
+     A            OPT1           4   B  6 16COLOR(WHT)
+     A            OPT2           4   B  7 16COLOR(WHT)
+     A            OPT3           4   B  8 16COLOR(WHT)
+     A            OPT4           4   B  9 16COLOR(WHT)
+     A            OPT5           4   B 10 16COLOR(WHT)
+     A            OPT6           4   B 11 16COLOR(WHT)
+     A            OPT7           4   B 12 16COLOR(WHT)
+     A            OPT8           4   B 13 16COLOR(WHT)
+     A            OPT9           4   B 14 16COLOR(WHT)
+     A            FILE2         36   O  7 27
+     A            FILE1         36   O  6 27
+     A            FILE5         36   O 10 27
+     A            FILE6         36   O 11 27
+     A            FILE9         36   O 14 27
+     A            FILE8         36   O 13 27
+     A            FILE7         36   O 12 27
+     A            FILE4         36   O  9 27
+     A            FILE3         36   O  8 27
+     A                                  3 31'Git Status'
+     A                                      COLOR(WHT)
+     A                                  3  6'giti'
+     A                                      COLOR(RED)
