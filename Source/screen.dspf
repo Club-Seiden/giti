@@ -71,7 +71,7 @@
      A            MSG           26   O 24  2COLOR(WHT)
      A                                  2  3'giti'
      A                                      COLOR(RED)
-     A                                 22 11'F6=Branches'
+     A                                 22 11'F6=Branches, F7=Status'
      A                                      COLOR(BLU)
      A                                  4 11'5=View, 7=Reset branch to here'
      A                                      COLOR(BLU)

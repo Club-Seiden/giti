@@ -1,1 +1,20 @@
-Â¤‰“„@—™–ƒ…¢¢@¢£™£‰•‡K%%ÅÙÙÖÙz%@n@™¤•¢˜“@¢˜“M}ÃÙÅÁãÅ@ãÁÂÓÅ@ØãÅÔ×aÇÉãÓÖÇ@M@ƒ–””‰£m‰„@‰•£@‡…•…™£…„@“¦¨¢@¢@‰„…•£‰£¨@•–£@•¤““k@ƒ–””‰£mˆ¢ˆ@ƒˆ™M÷]@•–£@•¤““k@ƒ–””‰£@n@âØÓùðñð%@n@Â¤‰“„@†‰“…@“‰•…z@÷%%ÃÙãâÙÃ×Æ@ÆÉÓÅMÇÉãÉaâ–¤™ƒ…]@ÙÃÄÓÅÕMññ@KKK@¢¤ƒƒ…¢¢†¤“K%Ã×èÆÙÔâãÔÆ@ÆÙÖÔâãÔÆM}â–¤™ƒ…a‡‰£‰Kƒ”„@KKK@¢¤ƒƒ…¢¢†¤“K%Ã×èÆÙÔâãÔÆ@ÆÙÖÔâãÔÆM}â–¤™ƒ…a¢ƒ™……•K„@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãÄâ×Æ@ÆÉÓÅMÇÉãÉaâÃÙÅÅÕ]@âÙÃÆÉÓÅMÇÉ@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãÙ×ÇÔÖÄ@ÔÖÄäÓÅMÇÉãÉa×ÁâÅÃÁÓÓ]@âÙÃâ@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãâØÓÙ×ÇÉ@ÖÂÑMÇÉãÉaÇÉãÓÖÇ×ÙâÅ]@âÙÃâ@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãâØÓÙ×ÇÉ@ÖÂÑMÇÉãÉaÇÉãÂÙÁÕÃÈ]@âÙÃâã@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãâØÓÙ×ÇÉ@ÖÂÑMÇÉãÉaÇÉãâãÁãäâ]@âÙÃâã@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãâØÓÙ×ÇÉ@ÖÂÑMÇÉãÉaÔÁÉÕ]@âÙÃâãÔÆM}â@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙã×ÇÔ@×ÇÔMÔÁÉÕ]@ÔÖÄäÓÅMÇÉãÉaÔÁÉÕ@ÇÉ@KKK@¢¤ƒƒ…¢¢†¤“K%ÃÙãÃÔÄ@ÃÔÄMÇÉãÉaÇÉãÉ]@×ÇÔMÇÉãÉaÔÁÉÕ]@KKK@¢¤ƒƒ…¢¢†¤“K%ÄÓãÖÂÑ@ÖÂÑMÇÉãÉaâ–¤™ƒ…]@ÖÂÑãè×ÅM\ÆÉÓ@KKK@¢¤ƒƒ…¢¢†¤“K%ÄÓãÖÂÑ@ÖÂÑMØãÅÔ×aÇÉãÓÖÇ]@ÖÂÑãè×ÅM\ÆÉ@KKK@¢¤ƒƒ…¢¢†¤“K%Â¤‰“£@‡‰£‰@¦‰£ˆ@ñ@…™™–™M¢]%
+Build process starting.
+
+ERROR:
+ > runsql sql('CREATE TABLE QTEMP/GITLOG ( commit_id int generated always as identity not null, commit_hash char(7) not null, commit > SQL9010
+ > Build file line: 7
+
+CRTSRCPF FILE(GITI/Source) RCDLEN(11 ... successful.
+CPYFRMSTMF FROMSTMF('Source/giti.cmd ... successful.
+CPYFRMSTMF FROMSTMF('Source/screen.d ... successful.
+CRTDSPF FILE(GITI/SCREEN) SRCFILE(GI ... successful.
+CRTRPGMOD MODULE(GITI/PASECALL) SRCS ... successful.
+CRTSQLRPGI OBJ(GITI/GITLOGPRSE) SRCS ... successful.
+CRTSQLRPGI OBJ(GITI/GITBRANCH) SRCST ... successful.
+CRTSQLRPGI OBJ(GITI/GITSTATUS) SRCST ... successful.
+CRTSQLRPGI OBJ(GITI/MAIN) SRCSTMF('S ... successful.
+CRTPGM PGM(MAIN) MODULE(GITI/MAIN GI ... successful.
+CRTCMD CMD(GITI/GITI) PGM(GITI/MAIN) ... successful.
+DLTOBJ OBJ(GITI/Source) OBJTYPE(*FIL ... successful.
+DLTOBJ OBJ(QTEMP/GITLOG) OBJTYPE(*FI ... successful.
+Built giti with 1 error(s)
