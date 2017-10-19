@@ -1,22 +1,24 @@
 **FREE
-Ctl-Opt DftActGrp(*No) ActGrp(*NEW);
 
 Dcl-F SCREEN Workstn;
 
 //GitLogParse is used to look for all commits
 //or for a specific file in the repo.
-Dcl-Pr GitLogParse ExtPgm('GITLOGPRSE');
+Dcl-Pr GitLogParse ExtProc('GITLOGPRSE');
   *N Char(128); //Pass in gFile
   *N Ind;       //Pass in gValid
 End-Pr;
 
-Dcl-Pr GitBranch ExtPgm('GITBRANCH');
+Dcl-Pr GitBranch ExtProc('GITBRANCH');
   pBranches LikeDS(Branches_Template) Dim(10);
 End-Pr;
 
-Dcl-Pr PASE ExtPgm('QP2SHELL2');
-  Path   Char(32) Const;
-  Script Char(128) Const;
+Dcl-Pr GitStatus ExtProc('GITSTATUS');
+  pStatuses LikeDS(Changes_Template) Dim(9);
+End-Pr;
+
+Dcl-Pr PASE ExtProc('GITI_PASECALL');
+  pCommand Char(1024) Const;
 END-PR;
 
 //***************************
@@ -25,6 +27,11 @@ Dcl-Ds Branches_Template Qualified Template;
   Name   Char(20);
   Active Ind;
 END-DS;
+
+Dcl-Ds Changes_Template Qualified Template;
+  Type Char(8);
+  File Char(30);
+End-Ds;
 
 //***************************
 
@@ -55,9 +62,7 @@ EXEC SQL
     commit_text char(128) not null
   );
 
-If (SQLSTATE = '00000');
-  GitLogParse(gFile:gValid);
-ENDIF;
+GitLogParse(gFile:gValid);
 
 giti_LoadCommits();
 giti_LoadScreen();
@@ -121,6 +126,9 @@ Dcl-Proc giti_LoadScreen;
     Select;
       When (*In06);
         giti_DisplayBranches();
+        
+      When (*In07);
+        giti_DisplayChanges();
 
       When (*In12);
         lExit = *On;
@@ -336,8 +344,7 @@ Dcl-Proc giti_DisplayCommit;
       When (*In12);
         lExit = *On;
       When (*In06);
-        PASE('/QOpenSys/usr/bin/-sh' + x'00'
-             :'git revert ' + CMTHSH + ' --no-commit' + x'00');
+        PASE('git revert ' + CMTHSH + ' --no-commit');
         lExit = *On;
       Other;
         //Nothing
@@ -382,8 +389,7 @@ Dcl-Proc giti_DisplayBranches;
     If (BIN0 = '5');
       //Create new branch
       If (BNAME0 <> *Blank);
-        PASE('/QOpenSys/usr/bin/-sh' + x'00'
-             :'git checkout -b ' + %Trim(BNAME0) + x'00');
+        PASE('git checkout -b ' + %Trim(BNAME0));
         lExit = *On;
         Return;
       Endif;
@@ -398,8 +404,7 @@ Dcl-Proc giti_DisplayBranches;
         When (lOpt(lIndex) = 'D');
           //Delete branch
         When (lOpt(lIndex) = '5');
-          PASE('/QOpenSys/usr/bin/-sh' + x'00'
-              :'git checkout ' + %TrimR(lBranches(lIndex).Name) + x'00');
+          PASE('git checkout ' + %TrimR(lBranches(lIndex).Name));
           GitLogParse(gFile:gValid);
           giti_LoadCommits();
           lExit = *On;
@@ -509,13 +514,68 @@ END-PROC;
 
 //******************
 
+Dcl-Proc giti_DisplayChanges;
+  Dcl-Ds lChanges  LikeDS(Changes_Template) Dim(9);
+  Dcl-S  lIndex    Int(3);
+  Dcl-S  lExit     Ind     Inz(*Off);
+  
+  GitStatus(lChanges);
+  Exsr CorrectText;
+  Exsr LoadChanges;
+  Exfmt MODLIST;
+  
+  Begsr CorrectText;
+    For lIndex = 1 to %Elem(lChanges);
+      Select;
+        When (lChanges(lIndex).Type = 'M');
+          lChanges(lIndex).Type = 'Modified';
+        When (lChanges(lIndex).Type = '?');
+          lChanges(lIndex).Type = 'Added';
+        When (lChanges(lIndex).Type = 'A');
+          lChanges(lIndex).Type = 'Added';
+        When (lChanges(lIndex).Type = 'D');
+          lChanges(lIndex).Type = 'Deleted';
+        When (lChanges(lIndex).Type = 'R');
+          lChanges(lIndex).Type = 'Renamed';
+        When (lChanges(lIndex).Type = 'C');
+          lChanges(lIndex).Type = 'Copied';
+        When (lChanges(lIndex).Type = 'U');
+          lChanges(lIndex).Type = 'Updated';
+      Endsl;
+    Endfor;
+  Endsr;
+  
+  Begsr LoadChanges;
+    MOD1 = lChanges(1).Type;
+    MOD2 = lChanges(2).Type;
+    MOD3 = lChanges(3).Type;
+    MOD4 = lChanges(4).Type;
+    MOD5 = lChanges(5).Type;
+    MOD6 = lChanges(6).Type;
+    MOD7 = lChanges(7).Type;
+    MOD8 = lChanges(8).Type;
+    MOD9 = lChanges(9).Type;
+    
+    FILE1 = lChanges(1).File;
+    FILE2 = lChanges(2).File;
+    FILE3 = lChanges(3).File;
+    FILE4 = lChanges(4).File;
+    FILE5 = lChanges(5).File;
+    FILE6 = lChanges(6).File;
+    FILE7 = lChanges(7).File;
+    FILE8 = lChanges(8).File;
+    FILE9 = lChanges(9).File;
+  Endsr;
+End-Proc;
+
+//******************
+
 Dcl-Proc giti_ResetToCommit;
   Dcl-Pi *N;
     pHash Char(7) Const;
   END-PI;
 
-  PASE('/QOpenSys/usr/bin/-sh' + x'00'
-      :'git reset --hard ' + pHash + x'00');
+  PASE('git reset --hard ' + pHash);
 
   GitLogParse(gFile:gValid);
   giti_LoadCommits();
