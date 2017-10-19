@@ -29,7 +29,7 @@ Dcl-Ds Branches_Template Qualified Template;
 END-DS;
 
 Dcl-Ds Changes_Template Qualified Template;
-  Type Char(1);
+  Type Char(8);
   File Char(30);
 End-Ds;
 
@@ -516,11 +516,34 @@ END-PROC;
 
 Dcl-Proc giti_DisplayChanges;
   Dcl-Ds lChanges  LikeDS(Changes_Template) Dim(9);
+  Dcl-S  lIndex    Int(3);
   Dcl-S  lExit     Ind     Inz(*Off);
   
   GitStatus(lChanges);
+  Exsr CorrectText;
   Exsr LoadChanges;
   Exfmt MODLIST;
+  
+  Begsr CorrectText;
+    For lIndex = 1 to %Elem(lChanges);
+      Select;
+        When (lChanges(lIndex).Type = 'M');
+          lChanges(lIndex).Type = 'Modified';
+        When (lChanges(lIndex).Type = '?');
+          lChanges(lIndex).Type = 'Added';
+        When (lChanges(lIndex).Type = 'A');
+          lChanges(lIndex).Type = 'Added';
+        When (lChanges(lIndex).Type = 'D');
+          lChanges(lIndex).Type = 'Deleted';
+        When (lChanges(lIndex).Type = 'R');
+          lChanges(lIndex).Type = 'Renamed';
+        When (lChanges(lIndex).Type = 'C');
+          lChanges(lIndex).Type = 'Copied';
+        When (lChanges(lIndex).Type = 'U');
+          lChanges(lIndex).Type = 'Updated';
+      Endsl;
+    Endfor;
+  Endsr;
   
   Begsr LoadChanges;
     MOD1 = lChanges(1).Type;

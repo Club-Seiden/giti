@@ -2,7 +2,7 @@
 Ctl-Opt NoMain;
 
 Dcl-Ds Changes_Template Qualified Template;
-  Type Char(1);
+  Type Char(8);
   File Char(30);
 End-Ds;
 
